@@ -21,37 +21,34 @@ Tras acceder al puerto 80, se mostró la página por defecto de Apache en Debian
 <img width="1916" height="912" alt="image" src="https://github.com/user-attachments/assets/25576186-7704-4979-8a11-c472fcca1051" />
 
 
-
+---
 
 Ante esto, vamos a ver en gobuster que tal.
 
 
 
-El comando utilizado fue: gobuster dir -u "IP" -w /usr/share/wordlists/dirb/common.txt -x php,html,txt
+El comando utilizado fue: **gobuster dir -u "IP" -w /usr/share/wordlists/dirb/common.txt -x php,html,txt**
 <img width="998" height="601" alt="image" src="https://github.com/user-attachments/assets/649a02a3-4d67-4b17-a37a-11cba095a003" />
-
 
 
 
 Durante el escaneo se identificó el directorio oculto /summary, que redirige a una ruta accesible desde el navegador. Parece ser el primer punto interesante para seguir explorando la web.
 
-
+---
 
 <img width="1919" height="856" alt="image" src="https://github.com/user-attachments/assets/95f8046f-f167-4fa5-a822-b6831b6e69ae" />
-
 
 
 Al acceder al directorio /summary, aparece una página muy simple con el mensaje “Cambia la contraseña”. Aunque no ofrece funcionalidad directa, nos puede sugerir un ataque de fuerza bruta ante SSH, En este punto, no tenemos ni usuario ni contraseña válidos, pero vamos a probar con un diccionario de usuarios y contraseñas
 
 
-
+---
 
 <img width="1758" height="175" alt="image" src="https://github.com/user-attachments/assets/417bc874-e2e0-4f7b-b271-f8b9e31e5604" />
 
 
 
-
-El comando utilizado fue: hydra -L /usr/share/wordlists/xato-net-10-million-passwords-1000.txt -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.137
+El comando utilizado fue: **hydra -L /usr/share/wordlists/xato-net-10-million-passwords-1000.txt -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.137**
 Tras varios intentos, Hydra devuelve una combinación válida: el usuario info con la contraseña qwerty. Esto confirma que el servicio SSH es vulnerable a fuerza bruta y nos permite avanzar hacia el acceso remoto.
 
 
