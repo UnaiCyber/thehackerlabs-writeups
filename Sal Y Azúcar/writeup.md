@@ -1,5 +1,8 @@
 # The Hacker Labs - Sal y Azúcar (Principiante)
 
+
+---
+
 ## 📖 Introducción
 
 Esta máquina de nivel principiante de The Hacker Labs plantea un recorrido sencillo en el que se combinan varias técnicas básicas de pentesting. Durante el laboratorio se descubren directorios ocultos en la aplicación web, se realiza un ataque de fuerza bruta contra el servicio SSH y finalmente se trabaja con una clave RSA obtenida, que es crackeada para conseguir acceso válido al sistema. El objetivo es mostrar de manera práctica cómo un atacante puede progresar desde la enumeración inicial hasta el acceso remoto, mostrando reconocimiento, explotación y gestión de credenciales.
@@ -72,3 +75,43 @@ Lo primero fue revisar los permisos sudo disponibles con sudo -l. El resultado m
 Este tipo de permiso es interesante porque puede ser aprovechado para leer archivos protegidos. Mirando GTFOBins, aparece una forma de usar base64 para leer cualquier archivo como root:
 <img width="1276" height="240" alt="image" src="https://github.com/user-attachments/assets/801c99e3-8186-42a2-8d3f-d683cfa026b7" />
 
+
+---
+
+
+Probé con el archivo /root/.ssh/id_rsa, que contiene la clave privada SSH del usuario root:
+
+El comando es **sudo /usr/bin/base64 /root/.ssh/id_rsa |  base64 --decode**
+
+<img width="1126" height="893" alt="ksnip_20251126-141509" src="https://github.com/user-attachments/assets/439cb348-8fd9-4489-82c8-c2690988b06a" />
+
+
+
+La clave se muestra completa, lo que confirma que tenemos acceso a información sensible. Para poder usarla, primero la convertí a un formato compatible con John the Ripper usando ssh2john, y luego lancé el crackeo con el diccionario rockyou.txt:
+
+
+<img width="1145" height="488" alt="ksnip_20251126-141521" src="https://github.com/user-attachments/assets/90772550-7f70-454c-aee2-1653997dd919" />
+
+John devuelve la contraseña: honda1. Con esto, ya es posible conectarse como root por SSH.
+
+
+
+---
+
+
+
+
+
+
+## 🏁 Acceso como root
+
+Con la contraseña de la clave privada ya crackeada (honda1), se establece conexión por SSH como el usuario root utilizando la clave obtenida:
+
+Con el comando: **ssh -i hash1 root@192.168.1.137**
+
+<img width="1095" height="339" alt="image" src="https://github.com/user-attachments/assets/bbbb52ae-6ef9-478f-beb8-0eec4575b81b" />
+
+
+La autenticación es exitosa y se accede directamente al sistema como administrador. Desde la sesión root, se navega al directorio /root y se obtiene la flag final del laboratorio leyendo la ultima flag.
+
+Con esto se completa el compromiso total de la máquina, habiendo pasado por todas las fases: enumeración, explotación inicial, escalada de privilegios y acceso como root.
